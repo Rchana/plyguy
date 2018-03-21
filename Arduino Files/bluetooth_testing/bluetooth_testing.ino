@@ -30,7 +30,7 @@ void loop()
     FSRReading0 = analogRead(FSR_Pin0);
     Serial.println("FSR0:");
     Serial.println(FSRReading0);
-    BTserial.println(FSRReading0);
+    BTserial.println((float) FSRReading0, 2);
     if(BTserial.available()){
       Serial.write(BTserial.read());
     }
@@ -40,6 +40,6 @@ void loop()
 //        c = BTserial.read();
 //    }
 //
-    delay(250);
+    delay(25U);
 }
 
