@@ -79,7 +79,7 @@ public class ArduinoMain extends Activity {
         myTimer.schedule(new TimerTask() {
             @Override
             public void run() {UpdateGUI();}
-        }, 0, 250);
+        }, 0, 100);
 
         functionOne.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
@@ -259,27 +259,49 @@ public class ArduinoMain extends Activity {
         public void run() {
             String stored = "";
             try {
+                Toast msg = Toast.makeText(getBaseContext(), "Too much pressure!", Toast.LENGTH_SHORT);;
+                String readMessage = "";
                 byte[] buffer = new byte[256];
                 int bytes;
                 int i = 0;
-
+                boolean isValidInt = false;
+                int numTries = 0;
                 while(i<4){
-                    if(inputStream.available() > 2) { // read 3 digits
-                    bytes = inputStream.read(buffer); //read bytes from input buffer
-                    String readMessage = new String(buffer, 0, bytes);
-                    stored = stored + " " + readMessage;
-//                    if (!readMessage.isEmpty()) {
-//                        if(Integer.parseInt(readMessage) > 875) {
-//                            Toast.makeText(getBaseContext(), "Add Ply! - Too much pressure", Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-                        Log.d("PlyGuy", readMessage);
-                        i++;
+                    if(inputStream.available() > 2) { // read if at least 4 digits are present
+                        bytes = inputStream.read(buffer); //read bytes from input buffer
+                        readMessage = new String(buffer, 0, bytes);
+                        int parsedData = 0;
+                        stored = stored + " " + readMessage;
+                        if(readMessage.indexOf(" ") > -1) {
+                            break;
+                        }
+                        Log.d("PlyGuy", "lol length is " + readMessage.length());
+                        if (!readMessage.isEmpty()) {
+                            while((!isValidInt && numTries < 1)) {
+                                try {
+                                    parsedData = Integer.parseInt(readMessage.substring(0,3));
+                                    if(parsedData > 870) {
+                                        Log.d("PlyGuy", "Too much");
+                                        msg.cancel();
+                                        msg.show();
+                                    } else {
+                                        msg.cancel();
+                                    }
+                                    isValidInt = true;
+                                } catch(Exception e) {
+                                    Log.d("PlyGuy", "Invalid format");
+                                    numTries++;
+                                    continue;
+                                }
+                            }
+                        }
+                        Log.d("PlyGuy", "Value: " + readMessage);
                     }
+                    i++;
                 }
-                forceValue.setText(stored);
+                forceValue.setText(readMessage);
             } catch (IOException e) {
-                Toast.makeText(getBaseContext(), "ERROR - FAILED", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(getBaseContext(), "ERROR - disconnected", Toast.LENGTH_SHORT).show();
             }
         }
     };
