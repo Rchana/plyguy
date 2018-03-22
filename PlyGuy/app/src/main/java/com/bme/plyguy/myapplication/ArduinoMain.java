@@ -11,6 +11,8 @@ import java.util.TimerTask;
 import java.lang.Runnable;
 import java.util.ArrayList;
 
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.util.Log;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -19,6 +21,7 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Bundle;
 // import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 // import android.view.View.OnKeyListener;
@@ -33,7 +36,11 @@ public class ArduinoMain extends Activity {
     //Declare buttons & editText
     Button functionOne, functionTwo;
     TextView forceValue;
+    TextView weightValue;
+    int parsedData; // represents bluetooth serial data after parsing to int
     int[] forceValuesMovingAverage = new int[10];
+
+    int newForceValueCount;
 
     // import fields to constantly update GUI
     int time = 0;
@@ -54,11 +61,34 @@ public class ArduinoMain extends Activity {
     // MAC-address of Bluetooth module
     public String newAddress = null;
 
+    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
+            = new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.navigation_home:
+                    finish();
+                    return true;
+//                    mTextMessage.setText(R.string.title_home);
+//                    return true;
+                case R.id.navigation_dashboard:
+                    return true;
+                case R.id.navigation_notifications:
+                    return true;
+            }
+            return false;
+        }
+    };
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_arduino_main);
+
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         // addKeyListener();
 
@@ -67,6 +97,7 @@ public class ArduinoMain extends Activity {
         functionOne = (Button) findViewById(R.id.functionOne);
         functionTwo = (Button) findViewById(R.id.functionTwo);
         forceValue = findViewById(R.id.forceValue);
+        weightValue = findViewById(R.id.weightValue);
 
         //getting the bluetooth adapter value and calling checkBTstate function
         btAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -93,7 +124,11 @@ public class ArduinoMain extends Activity {
 
         functionTwo.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                Toast.makeText(getBaseContext(), "No function!", Toast.LENGTH_SHORT).show();
+                if(parsedData > 1000) {
+                    weightValue.setText("Last manually detected weight: " + ">> 10 kg");
+                } else {
+                    weightValue.setText("Last manually detected weight: " + String.valueOf(parsedData/100.0) + "kg");
+                }
             }
         });
     }
@@ -155,6 +190,7 @@ public class ArduinoMain extends Activity {
             }
         } catch (IOException e) {
             Toast.makeText(getBaseContext(), "ERROR - FAILED", Toast.LENGTH_SHORT).show();
+            finish();
         }
 
         //When activity is resumed, attempt to send a piece of junk data ('x') so that it will fail if not connected
@@ -177,7 +213,6 @@ public class ArduinoMain extends Activity {
     }
     //takes the UUID and creates a comms socket
     private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException {
-
         return  device.createRfcommSocketToServiceRecord(MY_UUID);
     }
 
@@ -215,43 +250,37 @@ public class ArduinoMain extends Activity {
                 byte[] buffer = new byte[256];
                 int bytes;
                 int i = 0;
-                boolean isValidInt = false;
-                int numTries = 0;
 
                 while(i<4){
-                    if(inputStream.available() > 2) { // read if at least 4 digits are present
+                    if(inputStream.available() > 3) { // read if at least 4 digits are present
                         bytes = inputStream.read(buffer); //read bytes from input buffer
                         readMessage = new String(buffer, 0, bytes);
-                        int parsedData;
                         stored = stored + " " + readMessage;
-                        Log.d("PlyGuy", "Value: " + readMessage + "; length is: " + readMessage.length());
-                        if(readMessage.indexOf(" ") > -1) { // ignore if whitespace is present
-                            break;
-                        }
                         if (!readMessage.isEmpty()) {
-                            while((!isValidInt && numTries < 1)) {
-                                try {
-                                    if(readMessage.length() == 3) {
-                                        parsedData = 0; // only reads 0 if length is 3
-                                    } else {
-                                        parsedData = Integer.parseInt(readMessage.substring(0,3));
-                                    }
-                                    if(parsedData > 865) {
-                                        Log.d("PlyGuy", "Too much");
-                                        forceValueMessage = "Pressure is too high!";
-                                        numGoodPressureCycles = 0;
-                                    } else { // pressure is gone; need consecutive tries until good
-                                        numGoodPressureCycles++;
-                                        if(numGoodPressureCycles > 30) {
-                                            forceValueMessage = "All good!";
-                                        }
-                                    }
-                                    isValidInt = true;
-                                } catch(Exception e) {
-                                    Log.d("PlyGuy", "Invalid format");
-                                    numTries++;
-                                    continue;
+                            try {
+                                int sum = 0;
+                                parsedData = Integer.parseInt(readMessage.substring(0,4));
+                                Log.d("PlyGuy", "Value: " + parsedData);
+                                forceValuesMovingAverage[newForceValueCount%10] = parsedData;
+                                newForceValueCount++;
+                                if(newForceValueCount == 1000) { newForceValueCount = 0; } // prevent overflow
+                                for(int index = 0; index < forceValuesMovingAverage.length; index++) {
+                                    sum += forceValuesMovingAverage[index];
                                 }
+                                Log.d("PlyGuy", "Sum: " + String.valueOf(sum));
+
+                                if(sum > 9900) {
+                                    Log.d("PlyGuy", "Too much");
+                                    forceValueMessage = "Pressure is too high!";
+                                    numGoodPressureCycles = 0;
+                                } else if (sum < 9500){ // pressure is gone; need consecutive tries until good
+                                    numGoodPressureCycles++;
+                                    if(numGoodPressureCycles > 20) {
+                                        forceValueMessage = "All good!";
+                                    }
+                                }
+                            } catch(Exception e) {
+                                Log.d("PlyGuy", "Invalid format");
                             }
                         }
                     }

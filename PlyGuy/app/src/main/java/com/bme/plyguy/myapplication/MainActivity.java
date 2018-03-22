@@ -45,8 +45,6 @@ public class MainActivity extends AppCompatActivity {
 //                    mTextMessage.setText(R.string.title_home);
 //                    return true;
                 case R.id.navigation_dashboard:
-                    Intent i = new Intent(MainActivity.this, ArduinoMain.class);
-                    startActivity(i);
                     return true;
                 case R.id.navigation_notifications:
                     return true;
@@ -82,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         //It is best to check BT status at onResume in case something has changed while app was paused etc
         checkBTState();
-
+        activityTitle.setVisibility(View.VISIBLE);
         mPairedDevicesArrayAdapter.clear();// clears the array so items aren't duplicated when resuming from onPause
 
         textConnectionStatus.setText(" "); //makes the textview blank

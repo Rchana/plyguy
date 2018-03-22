@@ -24,7 +24,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Select btSerial device from paired devices:"
         android:visibility="gone"
-        android:background="#666"
+        android:background="#AAA"
         android:textColor="#fff"
         android:paddingLeft="10dp"
         />
@@ -32,18 +32,22 @@
     <ListView
         android:id="@+id/paired_devices"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
         android:layout_marginTop="50dp"
         android:layout_marginBottom="45dp"
         android:layout_weight="1"
         android:stackFromBottom="false"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:scrollbarSize="3dp"
+        android:scrollbarStyle="outsideOverlay"
+        android:scrollbars="vertical"
+        android:scrollingCache="true"
+        android:smoothScrollbar="true"/>
 
     <TextView
         android:id="@+id/connecting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#666"
+        android:background="#AAA"
         android:textColor="#ffffff"
         android:paddingLeft="10dp"
         android:visibility="invisible"
@@ -54,17 +58,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <ScrollView
-        android:id="@+id/scrollView2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"></LinearLayout>
-    </ScrollView>
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation"
