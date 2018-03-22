@@ -26,7 +26,7 @@
         android:visibility="gone"
         android:background="#666"
         android:textColor="#fff"
-        android:paddingLeft="5dp"
+        android:paddingLeft="10dp"
         />
 
     <ListView
@@ -41,8 +41,12 @@
 
     <TextView
         android:id="@+id/connecting"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#666"
+        android:textColor="#ffffff"
+        android:paddingLeft="10dp"
+        android:visibility="invisible"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextView

@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     public static String EXTRA_DEVICE_ADDRESS;
 
     private TextView mTextMessage;
+    private TextView activityTitle;
     // TextView for connection status
     TextView textConnectionStatus;
     ListView pairedListView;
@@ -59,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        activityTitle = (TextView) findViewById(R.id.title_paired_devices);
         mTextMessage = (TextView) findViewById(R.id.message);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
@@ -123,6 +125,8 @@ public class MainActivity extends AppCompatActivity {
     {
         public void onItemClick(AdapterView<?> av, View v, int arg2, long arg3)
         {
+            activityTitle.setVisibility(View.INVISIBLE);
+            textConnectionStatus.setVisibility(View.VISIBLE);
             textConnectionStatus.setText("Connecting...");
             // Get the device MAC address, which is the last 17 chars in the View
             String info = ((TextView) v).getText().toString();

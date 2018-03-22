@@ -14,6 +14,7 @@ SoftwareSerial BTserial(2, 3); // RX | TX
 char c = ' ';
 int FSR_Pin0 = A0; 
 int FSRReading0;
+String btSerialOut = "";
 
 void setup() 
 {
@@ -28,9 +29,19 @@ void setup()
 void loop()
 {
     FSRReading0 = analogRead(FSR_Pin0);
+    
+    if(FSRReading0 < 10) { // add leading zeros
+      btSerialOut = String("000" + String(FSRReading0));
+    } else if(FSRReading0 < 100) {
+      btSerialOut = String("00" + String(FSRReading0));
+    } else if(FSRReading0 < 1000) {
+      btSerialOut = String("0" + String(FSRReading0));
+    } else { btSerialOut = String(FSRReading0); }
+
     Serial.println("FSR0:");
-    Serial.println(FSRReading0);
-    BTserial.println(FSRReading0);
+    Serial.println(btSerialOut);
+    
+    BTserial.println(btSerialOut);
     if(BTserial.available()){
       Serial.write(BTserial.read());
     }

@@ -4,10 +4,12 @@ import java.io.IOException;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.UUID;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.lang.Runnable;
+import java.util.ArrayList;
 
 import android.util.Log;
 import android.app.Activity;
@@ -16,12 +18,12 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.KeyEvent;
+// import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnKeyListener;
+// import android.view.View.OnKeyListener;
 import android.widget.Button;
-import android.widget.EditText;
+// import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.os.Handler;
@@ -31,12 +33,13 @@ public class ArduinoMain extends Activity {
     //Declare buttons & editText
     Button functionOne, functionTwo;
     TextView forceValue;
+    int[] forceValuesMovingAverage = new int[10];
 
     // import fields to constantly update GUI
     int time = 0;
     final Handler myHandler = new Handler();
 
-    private EditText editText;
+    // private EditText editText;
 
     //Memeber Fields
     private BluetoothAdapter btAdapter = null;
@@ -57,7 +60,7 @@ public class ArduinoMain extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_arduino_main);
 
-        addKeyListener();
+        // addKeyListener();
 
         //Initialising buttons in the view
         //mDetect = (Button) findViewById(R.id.mDetect);
@@ -69,7 +72,7 @@ public class ArduinoMain extends Activity {
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         checkBTState();
 
-        /**************************************************************************************************************************8
+        /*
          *  Buttons are set up with onclick listeners so when pressed a method is called
          *  In this case send data is called with a value and a toast is made
          *  to give visual feedback of the selection made
@@ -79,34 +82,18 @@ public class ArduinoMain extends Activity {
         myTimer.schedule(new TimerTask() {
             @Override
             public void run() {UpdateGUI();}
-        }, 0, 100);
+        }, 0, 110);
 
         functionOne.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                sendData("1");
+                // sendData("1");
                 Toast.makeText(getBaseContext(), "Function 1", Toast.LENGTH_SHORT).show();
             }
         });
 
         functionTwo.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                String stored = "";
-                try {
-                    byte[] buffer = new byte[256];
-                    int bytes;
-                    int i = 0;
-
-                    while(i<2){
-                        bytes = inputStream.read(buffer); //read bytes from input buffer
-                        String readMessage = new String(buffer, 0, bytes);
-                        stored = stored + " " + readMessage;
-                        forceValue.setText(stored);
-                        Log.d("PlyGuy", readMessage);
-                        i++;
-                    }
-                } catch (IOException e) {
-                    Toast.makeText(getBaseContext(), "ERROR - FAILED", Toast.LENGTH_SHORT).show();
-                }
+                Toast.makeText(getBaseContext(), "No function!", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -172,7 +159,7 @@ public class ArduinoMain extends Activity {
 
         //When activity is resumed, attempt to send a piece of junk data ('x') so that it will fail if not connected
         // i.e don't wait for a user to press button to recognise connection failure
-        sendData("x");
+        // sendData("x");
     }
 
     @Override
@@ -210,43 +197,6 @@ public class ArduinoMain extends Activity {
         }
     }
 
-    // Method to send data
-    private void sendData(String message) {
-        byte[] msgBuffer = message.getBytes();
-
-        try {
-            //attempt to place data on the outstream to the BT device
-            outStream.write(msgBuffer);
-        } catch (IOException e) {
-            //if the sending fails this is most likely because device is no longer there
-            Toast.makeText(getBaseContext(), "ERROR - Device not found", Toast.LENGTH_SHORT).show();
-            finish();
-        }
-    }
-
-    public void addKeyListener() {
-
-        // get edittext component
-        editText = (EditText) findViewById(R.id.editText1);
-
-        // add a keylistener to keep track user input
-        editText.setOnKeyListener(new OnKeyListener() {
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-
-                // if keydown and send is pressed implement the sendData method
-                if ((keyCode == KeyEvent.KEYCODE_ENTER) && (event.getAction() == KeyEvent.ACTION_DOWN)) {
-                    //I have put the * in automatically so it is no longer needed when entering text
-                    sendData('*' + editText.getText().toString());
-                    Toast.makeText(getBaseContext(), "Sending text", Toast.LENGTH_SHORT).show();
-
-                    return true;
-                }
-
-                return false;
-            }
-        });
-    }
-
     // Timer functions for updating GUI
 
     private void UpdateGUI() {
@@ -256,36 +206,45 @@ public class ArduinoMain extends Activity {
     }
 
     final Runnable myRunnable = new Runnable() {
+        String forceValueMessage = "All good!";
+        int numGoodPressureCycles;
         public void run() {
             String stored = "";
             try {
-                Toast msg = Toast.makeText(getBaseContext(), "Too much pressure!", Toast.LENGTH_SHORT);;
-                String readMessage = "";
+                String readMessage;
                 byte[] buffer = new byte[256];
                 int bytes;
                 int i = 0;
                 boolean isValidInt = false;
                 int numTries = 0;
+
                 while(i<4){
                     if(inputStream.available() > 2) { // read if at least 4 digits are present
                         bytes = inputStream.read(buffer); //read bytes from input buffer
                         readMessage = new String(buffer, 0, bytes);
-                        int parsedData = 0;
+                        int parsedData;
                         stored = stored + " " + readMessage;
-                        if(readMessage.indexOf(" ") > -1) {
+                        Log.d("PlyGuy", "Value: " + readMessage + "; length is: " + readMessage.length());
+                        if(readMessage.indexOf(" ") > -1) { // ignore if whitespace is present
                             break;
                         }
-                        Log.d("PlyGuy", "lol length is " + readMessage.length());
                         if (!readMessage.isEmpty()) {
                             while((!isValidInt && numTries < 1)) {
                                 try {
-                                    parsedData = Integer.parseInt(readMessage.substring(0,3));
-                                    if(parsedData > 870) {
-                                        Log.d("PlyGuy", "Too much");
-                                        msg.cancel();
-                                        msg.show();
+                                    if(readMessage.length() == 3) {
+                                        parsedData = 0; // only reads 0 if length is 3
                                     } else {
-                                        msg.cancel();
+                                        parsedData = Integer.parseInt(readMessage.substring(0,3));
+                                    }
+                                    if(parsedData > 865) {
+                                        Log.d("PlyGuy", "Too much");
+                                        forceValueMessage = "Pressure is too high!";
+                                        numGoodPressureCycles = 0;
+                                    } else { // pressure is gone; need consecutive tries until good
+                                        numGoodPressureCycles++;
+                                        if(numGoodPressureCycles > 30) {
+                                            forceValueMessage = "All good!";
+                                        }
                                     }
                                     isValidInt = true;
                                 } catch(Exception e) {
@@ -295,11 +254,10 @@ public class ArduinoMain extends Activity {
                                 }
                             }
                         }
-                        Log.d("PlyGuy", "Value: " + readMessage);
                     }
                     i++;
                 }
-                forceValue.setText(readMessage);
+                forceValue.setText(forceValueMessage);
             } catch (IOException e) {
                 // Toast.makeText(getBaseContext(), "ERROR - disconnected", Toast.LENGTH_SHORT).show();
             }
