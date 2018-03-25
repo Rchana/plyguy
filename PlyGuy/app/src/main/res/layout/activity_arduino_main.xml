@@ -137,11 +137,12 @@
 
         <ImageView
             android:id="@+id/checkmark"
-            android:layout_width="wrap_content"
+            android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:src="@mipmap/ic_checkmark_black" />
+            android:src="@drawable/checkmark"
+            android:visibility="invisible" />
 
         <ImageView
             android:id="@+id/circle"

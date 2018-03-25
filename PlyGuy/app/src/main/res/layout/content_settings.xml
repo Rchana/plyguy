@@ -8,4 +8,120 @@
     tools:context="com.bme.plyguy.myapplication.settings"
     tools:showIn="@layout/activity_settings">
 
+    <TextView
+        android:id="@+id/textView9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Settings"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        tools:layout_editor_absoluteX="129dp"
+        tools:layout_editor_absoluteY="16dp" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:inputType="textPersonName"
+        android:text="General Information"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="81dp" />
+
+    <ImageButton
+        android:id="@+id/imageButton"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        app:srcCompat="@android:drawable/ic_menu_edit"
+        tools:layout_editor_absoluteX="295dp"
+        tools:layout_editor_absoluteY="289dp" />
+
+    <ImageButton
+        android:id="@+id/imageButton2"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        app:srcCompat="@android:drawable/ic_menu_edit"
+        tools:layout_editor_absoluteX="295dp"
+        tools:layout_editor_absoluteY="81dp" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Age:"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="131dp" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Amputation Type"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="215dp" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Weight"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="171dp" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:inputType="textPersonName"
+        android:text="Sock-Ply Settings"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="289dp" />
+
+    <SeekBar
+        android:id="@+id/seekBar"
+        android:layout_width="278dp"
+        android:layout_height="25dp"
+        tools:layout_editor_absoluteX="55dp"
+        tools:layout_editor_absoluteY="394dp" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1-Ply"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="351dp" />
+
+    <SeekBar
+        android:id="@+id/seekBar2"
+        android:layout_width="277dp"
+        android:layout_height="25dp"
+        tools:layout_editor_absoluteX="55dp"
+        tools:layout_editor_absoluteY="351dp" />
+
+    <TextView
+        android:id="@+id/textView7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="3-Ply"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="441dp" />
+
+    <SeekBar
+        android:id="@+id/seekBar3"
+        android:layout_width="277dp"
+        android:layout_height="24dp"
+        tools:layout_editor_absoluteX="55dp"
+        tools:layout_editor_absoluteY="441dp" />
+
+    <TextView
+        android:id="@+id/textView8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="2-Ply"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="394dp" />
 </android.support.constraint.ConstraintLayout>

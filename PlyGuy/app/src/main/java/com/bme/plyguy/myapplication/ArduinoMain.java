@@ -303,11 +303,12 @@ public class ArduinoMain extends Activity {
                                     }
                                 }
 
+                                /*
                                 //Laura's Additions
                                 else if (sum > 9700 && sum < 9900) {
                                     forceValueMessage = "Apply Sock Ply!";
                                     statusTitle.setBackgroundColor(Color.parseColor("#B70F0A"));
-                                    findViewById(R.id.RL).setBackgroundColor(getResources().getColor(R.color.colorLightYellow);
+                                    findViewById(R.id.RL).setBackgroundColor(getResources().getColor(R.color.colorLightYellow));
                                     findViewById(R.id.checkmark).setVisibility(View.INVISIBLE);
                                     findViewById(R.id.circle).setVisibility(View.VISIBLE);
                                     findViewById(R.id.navigationGood).setVisibility(View.INVISIBLE);
@@ -372,7 +373,7 @@ public class ArduinoMain extends Activity {
                                     findViewById(R.id.fivePly).setVisibility(View.INVISIBLE);
                                     numGoodPressureCycles = 0;
                                 }
-
+                                */
 
                             } catch(Exception e) {
                                 Log.d("PlyGuy", "Invalid format");
