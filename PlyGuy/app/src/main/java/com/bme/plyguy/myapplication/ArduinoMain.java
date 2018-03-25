@@ -278,6 +278,13 @@ public class ArduinoMain extends Activity {
                                     statusTitle.setBackgroundColor(Color.parseColor("#B70F0A"));
                                     findViewById(R.id.RL).setBackgroundColor(getResources().getColor(R.color.colorLightRed));
                                     findViewById(R.id.checkmark).setVisibility(View.INVISIBLE);
+                                    findViewById(R.id.circle).setVisibility(View.VISIBLE);
+                                    findViewById(R.id.navigationGood).setVisibility(View.INVISIBLE);
+                                    findViewById(R.id.addPlyText).setVisibility(View.VISIBLE);
+                                    findViewById(R.id.removePlyText).setVisibility(View.INVISIBLE);
+                                    findViewById(R.id.onePly).setVisibility(View.INVISIBLE);
+                                    findViewById(R.id.threePly).setVisibility(View.INVISIBLE);
+                                    findViewById(R.id.fivePly).setVisibility(View.VISIBLE);
                                     numGoodPressureCycles = 0;
                                 } else if (sum < 9500){ // pressure is gone; need consecutive tries until good
                                     numGoodPressureCycles++;
@@ -285,9 +292,88 @@ public class ArduinoMain extends Activity {
                                         statusTitle.setBackgroundColor(getResources().getColor(R.color.colorDarkGreen));
                                         findViewById(R.id.RL).setBackgroundColor(getResources().getColor(R.color.colorLightGreen));
                                         findViewById(R.id.checkmark).setVisibility(View.VISIBLE);
+                                        findViewById(R.id.circle).setVisibility(View.INVISIBLE);
+                                        findViewById(R.id.navigationGood).setVisibility(View.VISIBLE);
+                                        findViewById(R.id.addPlyText).setVisibility(View.INVISIBLE);
+                                        findViewById(R.id.removePlyText).setVisibility(View.INVISIBLE);
+                                        findViewById(R.id.onePly).setVisibility(View.INVISIBLE);
+                                        findViewById(R.id.threePly).setVisibility(View.INVISIBLE);
+                                        findViewById(R.id.fivePly).setVisibility(View.INVISIBLE);
                                         forceValueMessage = "All Good!";
                                     }
                                 }
+
+                                //Laura's Additions
+                                else if (sum > 9700 && sum < 9900) {
+                                    forceValueMessage = "Apply Sock Ply!";
+                                    statusTitle.setBackgroundColor(Color.parseColor("#B70F0A"));
+                                    findViewById(R.id.RL).setBackgroundColor(getResources().getColor(R.color.colorLightYellow);
+                                    findViewById(R.id.checkmark).setVisibility(View.INVISIBLE);
+                                    findViewById(R.id.circle).setVisibility(View.VISIBLE);
+                                    findViewById(R.id.navigationGood).setVisibility(View.INVISIBLE);
+                                    findViewById(R.id.addPlyText).setVisibility(View.VISIBLE);
+                                    findViewById(R.id.removePlyText).setVisibility(View.INVISIBLE);
+                                    findViewById(R.id.onePly).setVisibility(View.VISIBLE);
+                                    findViewById(R.id.threePly).setVisibility(View.INVISIBLE);
+                                    findViewById(R.id.fivePly).setVisibility(View.INVISIBLE);
+                                    numGoodPressureCycles = 0;
+                                } else if () {
+                                    forceValueMessage = "Apply Sock Ply!";
+                                    statusTitle.setBackgroundColor(Color.parseColor("#B70F0A"));
+                                    findViewById(R.id.RL).setBackgroundColor(getResources().getColor(R.color.colorLightOrange);
+                                    findViewById(R.id.checkmark).setVisibility(View.INVISIBLE);
+                                    findViewById(R.id.circle).setVisibility(View.VISIBLE);
+                                    findViewById(R.id.navigationGood).setVisibility(View.INVISIBLE);
+                                    findViewById(R.id.addPlyText).setVisibility(View.VISIBLE);
+                                    findViewById(R.id.removePlyText).setVisibility(View.INVISIBLE);
+                                    findViewById(R.id.onePly).setVisibility(View.INVISIBLE);
+                                    findViewById(R.id.threePly).setVisibility(View.VISIBLE);
+                                    findViewById(R.id.fivePly).setVisibility(View.INVISIBLE);
+                                    numGoodPressureCycles = 0;
+                                }
+                                //For Side Sensors
+                                if (sum > 9900) {
+                                    forceValueMessage = "Remove Sock Ply!";
+                                    statusTitle.setBackgroundColor(Color.parseColor("#B70F0A"));
+                                    findViewById(R.id.RL).setBackgroundColor(getResources().getColor(R.color.colorLightRed));
+                                    findViewById(R.id.checkmark).setVisibility(View.INVISIBLE);
+                                    findViewById(R.id.circle).setVisibility(View.VISIBLE);
+                                    findViewById(R.id.navigationGood).setVisibility(View.INVISIBLE);
+                                    findViewById(R.id.addPlyText).setVisibility(View.INVISIBLE);
+                                    findViewById(R.id.removePlyText).setVisibility(View.VISIBLE);
+                                    findViewById(R.id.onePly).setVisibility(View.INVISIBLE);
+                                    findViewById(R.id.threePly).setVisibility(View.INVISIBLE);
+                                    findViewById(R.id.fivePly).setVisibility(View.VISIBLE);
+                                    numGoodPressureCycles = 0;
+                                } else if (//medium pressure on sides) {
+                                    forceValueMessage = "Remove Sock Ply!";
+                                    statusTitle.setBackgroundColor(Color.parseColor("#B70F0A"));
+                                    findViewById(R.id.RL).setBackgroundColor(getResources().getColor(R.color.colorLightOrange));
+                                    findViewById(R.id.checkmark).setVisibility(View.INVISIBLE);
+                                    findViewById(R.id.circle).setVisibility(View.VISIBLE);
+                                    findViewById(R.id.navigationGood).setVisibility(View.INVISIBLE);
+                                    findViewById(R.id.addPlyText).setVisibility(View.INVISIBLE);
+                                    findViewById(R.id.removePlyText).setVisibility(View.VISIBLE);
+                                    findViewById(R.id.onePly).setVisibility(View.INVISIBLE);
+                                    findViewById(R.id.threePly).setVisibility(View.VISIBLE);
+                                    findViewById(R.id.fivePly).setVisibility(View.INVISIBLE);
+                                    numGoodPressureCycles = 0;
+                                } else if (//small pressure on sides) {
+                                    forceValueMessage = "Remove Sock Ply!";
+                                    statusTitle.setBackgroundColor(Color.parseColor("#B70F0A"));
+                                    findViewById(R.id.RL).setBackgroundColor(getResources().getColor(R.color.colorLightYellow));
+                                    findViewById(R.id.checkmark).setVisibility(View.INVISIBLE);
+                                    findViewById(R.id.circle).setVisibility(View.VISIBLE);
+                                    findViewById(R.id.navigationGood).setVisibility(View.INVISIBLE);
+                                    findViewById(R.id.addPlyText).setVisibility(View.INVISIBLE);
+                                    findViewById(R.id.removePlyText).setVisibility(View.VISIBLE);
+                                    findViewById(R.id.onePly).setVisibility(View.VISIBLE);
+                                    findViewById(R.id.threePly).setVisibility(View.INVISIBLE);
+                                    findViewById(R.id.fivePly).setVisibility(View.INVISIBLE);
+                                    numGoodPressureCycles = 0;
+                                }
+
+
                             } catch(Exception e) {
                                 Log.d("PlyGuy", "Invalid format");
                             }

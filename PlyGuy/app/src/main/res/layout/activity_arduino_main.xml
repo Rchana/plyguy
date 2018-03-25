@@ -32,14 +32,15 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/checkmark"
             android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
             android:bottomLeftRadius="10dp"
             android:bottomRightRadius="10dp"
-            android:layout_marginTop="20dp"
             android:gravity="center"
             android:text="Check Sock Status"
             android:textAllCaps="false"
             android:topLeftRadius="10dp"
-            android:topRightRadius="10dp" />
+            android:topRightRadius="10dp"
+            android:visibility="invisible" />
 
         <TextView
             android:id="@+id/forceValue"
@@ -47,13 +48,14 @@
             android:layout_height="wrap_content"
             android:layout_above="@+id/weightValue"
             android:layout_alignParentStart="true"
-            android:layout_gravity="center"
             android:layout_centerHorizontal="true"
+            android:layout_gravity="center"
             android:gravity="center"
             android:text="Force Value"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textColor="@android:color/black"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:visibility="invisible" />
 
         <TextView
             android:id="@+id/statusTitle"
@@ -75,14 +77,63 @@
             android:id="@+id/weightValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
             android:layout_marginBottom="61dp"
             android:layout_marginStart="79dp"
+            android:gravity="center_horizontal"
             android:text="Last manually detected weight: "
             android:textColor="#000000"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:visibility="invisible" />
+
+        <TextView
+            android:id="@+id/addPlyText"
+            android:layout_width="wrap_content"
+            android:layout_height="150dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="Add"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:visibility="invisible" />
+
+        <TextView
+            android:id="@+id/removePlyText"
+            android:layout_width="wrap_content"
+            android:layout_height="150dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="Remove"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
+
+        <TextView
+            android:id="@+id/fivePly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="5 Ply"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display3" />
+
+        <TextView
+            android:id="@+id/threePly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="3 Ply"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display3"
+            android:visibility="invisible" />
+
+        <TextView
+            android:id="@+id/onePly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="1 Ply"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display3"
+            android:visibility="invisible" />
 
         <ImageView
             android:id="@+id/checkmark"
@@ -92,17 +143,56 @@
             android:layout_centerVertical="true"
             android:src="@mipmap/ic_checkmark_black" />
 
+        <ImageView
+            android:id="@+id/circle"
+            android:layout_width="250dp"
+            android:layout_height="475dp"
+            android:layout_alignBottom="@+id/forceValue"
+            android:layout_alignStart="@+id/weightValue"
+            android:layout_marginBottom="11dp"
+            android:src="@drawable/circle" />
+
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/button"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="13dp"
+            android:text="Socks Applied and Prosthesis Donned" />
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/forceValue"
+            android:layout_alignBottom="@+id/forceValue"
+            android:layout_alignStart="@+id/button2"
+            android:text="Snooze" />
+
+        <EditText
+            android:id="@+id/editText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/button"
+            android:layout_alignBottom="@+id/button"
+            android:layout_toEndOf="@+id/button"
+            android:ems="10"
+            android:inputType="number"
+            android:text="25 Minutes" />
+
     </RelativeLayout>
 
     <android.support.design.widget.BottomNavigationView
-        android:id="@+id/navigation"
+        android:id="@+id/navigationGood"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="0dp"
-        android:layout_marginStart="0dp"
         android:background="?android:attr/windowBackground"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:menu="@menu/navigation" />
+        app:menu="@menu/navigation">
+
+    </android.support.design.widget.BottomNavigationView>
 </android.support.constraint.ConstraintLayout>
