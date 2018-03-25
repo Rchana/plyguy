@@ -11,6 +11,7 @@ import java.util.TimerTask;
 import java.lang.Runnable;
 import java.util.ArrayList;
 
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.util.Log;
@@ -34,9 +35,10 @@ import android.os.Handler;
 public class ArduinoMain extends Activity {
 
     //Declare buttons & editText
-    Button functionOne, functionTwo;
+    Button functionOne, checkSockStatus;
     TextView forceValue;
     TextView weightValue;
+    TextView statusTitle;
     int parsedData; // represents bluetooth serial data after parsing to int
     int[] forceValuesMovingAverage = new int[10];
 
@@ -94,8 +96,9 @@ public class ArduinoMain extends Activity {
 
         //Initialising buttons in the view
         //mDetect = (Button) findViewById(R.id.mDetect);
+        statusTitle = findViewById(R.id.statusTitle);
         functionOne = (Button) findViewById(R.id.functionOne);
-        functionTwo = (Button) findViewById(R.id.functionTwo);
+        checkSockStatus = (Button) findViewById(R.id.checkSockStatus);
         forceValue = findViewById(R.id.forceValue);
         weightValue = findViewById(R.id.weightValue);
 
@@ -122,7 +125,7 @@ public class ArduinoMain extends Activity {
             }
         });
 
-        functionTwo.setOnClickListener(new OnClickListener() {
+        checkSockStatus.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 if(parsedData > 1000) {
                     weightValue.setText("Last manually detected weight: " + ">> 10 kg");
@@ -271,12 +274,18 @@ public class ArduinoMain extends Activity {
 
                                 if(sum > 9900) {
                                     Log.d("PlyGuy", "Too much");
-                                    forceValueMessage = "Pressure is too high!";
+                                    forceValueMessage = "Apply Sock Ply!";
+                                    statusTitle.setBackgroundColor(Color.parseColor("#B70F0A"));
+                                    findViewById(R.id.RL).setBackgroundColor(getResources().getColor(R.color.colorLightRed));
+                                    findViewById(R.id.checkmark).setVisibility(View.INVISIBLE);
                                     numGoodPressureCycles = 0;
                                 } else if (sum < 9500){ // pressure is gone; need consecutive tries until good
                                     numGoodPressureCycles++;
                                     if(numGoodPressureCycles > 20) {
-                                        forceValueMessage = "All good!";
+                                        statusTitle.setBackgroundColor(getResources().getColor(R.color.colorDarkGreen));
+                                        findViewById(R.id.RL).setBackgroundColor(getResources().getColor(R.color.colorLightGreen));
+                                        findViewById(R.id.checkmark).setVisibility(View.VISIBLE);
+                                        forceValueMessage = "All Good!";
                                     }
                                 }
                             } catch(Exception e) {
@@ -287,6 +296,7 @@ public class ArduinoMain extends Activity {
                     i++;
                 }
                 forceValue.setText(forceValueMessage);
+                statusTitle.setText(forceValueMessage);
             } catch (IOException e) {
                 // Toast.makeText(getBaseContext(), "ERROR - disconnected", Toast.LENGTH_SHORT).show();
             }

@@ -11,12 +11,10 @@
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/RL"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="@dimen/activity_vertical_margin"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin"
+        android:background="@color/colorLightGreen"
         tools:context=".ArduinoMain" >
 
         <Button
@@ -29,59 +27,70 @@
             android:visibility="invisible" />
 
         <Button
-            android:id="@+id/functionTwo"
-            android:textAllCaps="false"
+            android:id="@+id/checkSockStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/functionOne"
+            android:layout_below="@+id/checkmark"
             android:layout_centerHorizontal="true"
-            android:gravity="center"
-            android:bottomRightRadius="10dp"
             android:bottomLeftRadius="10dp"
+            android:bottomRightRadius="10dp"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:text="Check Sock Status"
+            android:textAllCaps="false"
             android:topLeftRadius="10dp"
-            android:topRightRadius="10dp"
-            android:text="Get Current Detected Weight" />
+            android:topRightRadius="10dp" />
 
         <TextView
             android:id="@+id/forceValue"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/functionTwo"
+            android:layout_above="@+id/weightValue"
+            android:layout_alignParentStart="true"
+            android:layout_gravity="center"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="121dp"
+            android:gravity="center"
             android:text="Force Value"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textColor="@android:color/black"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/textView3"
+            android:id="@+id/statusTitle"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:fontFamily="sans-serif-condensed"
-            android:text="Sock Status"
+            android:background="#4C7A34"
+            android:fontFamily="sans-serif"
+            android:gravity="center_horizontal"
+            android:paddingBottom="25dp"
+            android:paddingTop="20dp"
+            android:text="All Good!"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-            android:textColor="#000000"
+            android:textColor="#FFFFFF"
             android:textStyle="bold" />
-
-        <View
-            android:layout_below="@+id/textView3"
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@android:color/darker_gray"/>
 
         <TextView
             android:id="@+id/weightValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/forceValue"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="35dp"
+            android:gravity="center_horizontal"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="61dp"
+            android:layout_marginStart="79dp"
+            android:text="Last manually detected weight: "
             android:textColor="#000000"
-            android:textStyle="bold"
-            android:text="Last manually detected weight: " />
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/checkmark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:src="@mipmap/ic_checkmark_black" />
 
     </RelativeLayout>
 
