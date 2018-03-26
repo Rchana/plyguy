@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView mTextMessage;
     private TextView activityTitle;
+    private BottomNavigationView navigation;
     // TextView for connection status
     TextView textConnectionStatus;
     ListView pairedListView;
@@ -60,8 +61,9 @@ public class MainActivity extends AppCompatActivity {
 
         activityTitle = (TextView) findViewById(R.id.title_paired_devices);
         mTextMessage = (TextView) findViewById(R.id.message);
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        navigation.setSelectedItemId(R.id.navigation_home);
 
         textConnectionStatus = (TextView) findViewById(R.id.connecting);
         textConnectionStatus.setTextSize(40);
@@ -80,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         //It is best to check BT status at onResume in case something has changed while app was paused etc
         checkBTState();
+        navigation.setSelectedItemId(R.id.navigation_home);
         activityTitle.setVisibility(View.VISIBLE);
         mPairedDevicesArrayAdapter.clear();// clears the array so items aren't duplicated when resuming from onPause
 

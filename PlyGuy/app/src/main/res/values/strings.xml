@@ -2,5 +2,6 @@
     <string name="app_name">PlyGuy</string>
     <string name="title_home">Device List</string>
     <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_notifications">Settings</string>
+    <string name="title_activity_settings">Settings</string>
 </resources>

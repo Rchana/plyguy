@@ -39,8 +39,14 @@ public class ArduinoMain extends Activity {
     TextView forceValue;
     TextView weightValue;
     TextView statusTitle;
-    int parsedData; // represents bluetooth serial data after parsing to int
-    int[] forceValuesMovingAverage = new int[10];
+    BottomNavigationView navigation;
+
+    int firstFSR; // represents first FSR bluetooth serial data after parsing to int
+    int secondFSR; // represents second FSR bluetooth serial data after parsing to int
+    int thirdFSR; // represents second FSR bluetooth serial data after parsing to int
+    int[] forceValuesMovingAverageFirstFSR = new int[10];
+    int[] forceValuesMovingAverageSecondFSR = new int[10];
+    int[] forceValuesMovingAverageThirdFSR = new int[10];
 
     int newForceValueCount;
 
@@ -77,6 +83,8 @@ public class ArduinoMain extends Activity {
                 case R.id.navigation_dashboard:
                     return true;
                 case R.id.navigation_notifications:
+                    Intent i = new Intent(ArduinoMain.this, Settings.class);
+                    startActivity(i);
                     return true;
             }
             return false;
@@ -89,11 +97,8 @@ public class ArduinoMain extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_arduino_main);
 
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-
-        // addKeyListener();
-
         //Initialising buttons in the view
         //mDetect = (Button) findViewById(R.id.mDetect);
         statusTitle = findViewById(R.id.statusTitle);
@@ -127,10 +132,10 @@ public class ArduinoMain extends Activity {
 
         checkSockStatus.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                if(parsedData > 1000) {
+                if(firstFSR > 1000) {
                     weightValue.setText("Last manually detected weight: " + ">> 10 kg");
                 } else {
-                    weightValue.setText("Last manually detected weight: " + String.valueOf(parsedData/100.0) + "kg");
+                    weightValue.setText("Last manually detected weight: " + String.valueOf(firstFSR/100.0) + "kg");
                 }
             }
         });
@@ -144,7 +149,6 @@ public class ArduinoMain extends Activity {
         //Get MAC address from DeviceListActivity
         Intent intent = getIntent();
         newAddress = intent.getStringExtra(MainActivity.EXTRA_DEVICE_ADDRESS);
-
         // Set up a pointer to the remote device using its address.
         BluetoothDevice device = btAdapter.getRemoteDevice(newAddress);
 
@@ -255,31 +259,37 @@ public class ArduinoMain extends Activity {
                 int i = 0;
 
                 while(i<4){
-                    if(inputStream.available() > 3) { // read if at least 4 digits are present
+                    if(inputStream.available() > 10) { // read if at least 10 digits are present
                         bytes = inputStream.read(buffer); //read bytes from input buffer
                         readMessage = new String(buffer, 0, bytes);
                         stored = stored + " " + readMessage;
+                        Log.d("PlyGuy", readMessage);
                         if (!readMessage.isEmpty()) {
                             try {
                                 int sum = 0;
-                                parsedData = Integer.parseInt(readMessage.substring(0,4));
-                                Log.d("PlyGuy", "Value: " + parsedData);
-                                forceValuesMovingAverage[newForceValueCount%10] = parsedData;
+                                firstFSR = Integer.parseInt(readMessage.substring(0,4));
+                                secondFSR = Integer.parseInt(readMessage.substring(5, 9));
+                                thirdFSR = Integer.parseInt(readMessage.substring(10, 14));
+
+                                forceValuesMovingAverageFirstFSR[newForceValueCount%10] = firstFSR;
+                                forceValuesMovingAverageSecondFSR[newForceValueCount%10] = secondFSR;
+                                forceValuesMovingAverageThirdFSR[newForceValueCount%10] = thirdFSR;
                                 newForceValueCount++;
                                 if(newForceValueCount == 1000) { newForceValueCount = 0; } // prevent overflow
-                                for(int index = 0; index < forceValuesMovingAverage.length; index++) {
-                                    sum += forceValuesMovingAverage[index];
+                                for(int index = 0; index < forceValuesMovingAverageFirstFSR.length; index++) {
+                                    sum += forceValuesMovingAverageFirstFSR[index];
+                                    sum += forceValuesMovingAverageSecondFSR[index];
                                 }
                                 Log.d("PlyGuy", "Sum: " + String.valueOf(sum));
 
-                                if(sum > 9900) {
+                                if(sum > 19500) {
                                     Log.d("PlyGuy", "Too much");
                                     forceValueMessage = "Apply Sock Ply!";
                                     statusTitle.setBackgroundColor(Color.parseColor("#B70F0A"));
                                     findViewById(R.id.RL).setBackgroundColor(getResources().getColor(R.color.colorLightRed));
                                     findViewById(R.id.checkmark).setVisibility(View.INVISIBLE);
                                     numGoodPressureCycles = 0;
-                                } else if (sum < 9500){ // pressure is gone; need consecutive tries until good
+                                } else if (sum < 18000){ // pressure is gone; need consecutive tries until good
                                     numGoodPressureCycles++;
                                     if(numGoodPressureCycles > 20) {
                                         statusTitle.setBackgroundColor(getResources().getColor(R.color.colorDarkGreen));
