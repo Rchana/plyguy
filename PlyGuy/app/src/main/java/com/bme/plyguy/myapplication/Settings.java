@@ -42,7 +42,6 @@ public class Settings extends AppCompatActivity {
         // mTextMessage = (TextView) findViewById(R.id.message);
         navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-        navigation.setSelectedItemId(R.id.navigation_notifications);
     }
 
 }

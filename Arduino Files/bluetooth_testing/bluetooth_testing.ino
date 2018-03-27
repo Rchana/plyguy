@@ -15,9 +15,11 @@ char c = ' ';
 int FSR_Pin0 = 0; 
 int FSR_Pin1 = 1;
 int FSR_Pin2 = 2;
+int FSR_Pin3 = 3;
 int FSRReading0;
 int FSRReading1;
 int FSRReading2;
+int FSRReading3;
 String btSerialOut = "";
 
 void setup() 
@@ -35,6 +37,7 @@ void loop()
     FSRReading0 = analogRead(FSR_Pin0);
     FSRReading1 = analogRead(FSR_Pin1);
     FSRReading2 = analogRead(FSR_Pin2);
+//    FSRReading3 = analogRead(FSR_Pin3);
     
     if(FSRReading0 < 10) { // add leading zeros
       btSerialOut = String("000" + String(FSRReading0));
@@ -60,8 +63,10 @@ void loop()
       btSerialOut = btSerialOut + " " + String("0" + String(FSRReading2));
     } else { btSerialOut = btSerialOut + " " + String(FSRReading2); }
     
-    Serial.println("FSR0, FSR1, FSR2:");
+    Serial.println("FSR0, FSR1, FSR2: ");
     Serial.println(btSerialOut);
+//    Serial.print(" ");
+//    Serial.print(FSRReading3);
     
     BTserial.println(btSerialOut);
     if(BTserial.available()){

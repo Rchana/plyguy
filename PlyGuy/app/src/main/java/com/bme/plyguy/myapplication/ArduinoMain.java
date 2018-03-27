@@ -4,16 +4,16 @@ import java.io.IOException;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
 import java.util.UUID;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.lang.Runnable;
-import java.util.ArrayList;
 
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -21,13 +21,11 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Bundle;
-// import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-// import android.view.View.OnKeyListener;
 import android.widget.Button;
-// import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.os.Handler;
@@ -39,7 +37,10 @@ public class ArduinoMain extends Activity {
     TextView forceValue;
     TextView weightValue;
     TextView statusTitle;
+    TextView plyMessage;
     BottomNavigationView navigation;
+    ImageView circle;
+    ImageView checkmark;
 
     int firstFSR; // represents first FSR bluetooth serial data after parsing to int
     int secondFSR; // represents second FSR bluetooth serial data after parsing to int
@@ -97,7 +98,7 @@ public class ArduinoMain extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_arduino_main);
 
-        navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         //Initialising buttons in the view
         //mDetect = (Button) findViewById(R.id.mDetect);
@@ -106,6 +107,9 @@ public class ArduinoMain extends Activity {
         checkSockStatus = (Button) findViewById(R.id.checkSockStatus);
         forceValue = findViewById(R.id.forceValue);
         weightValue = findViewById(R.id.weightValue);
+        circle = findViewById(R.id.circle);
+        checkmark = findViewById(R.id.checkmark);
+        plyMessage = findViewById(R.id.plyMessage);
 
         //getting the bluetooth adapter value and calling checkBTstate function
         btAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -137,6 +141,16 @@ public class ArduinoMain extends Activity {
                 } else {
                     weightValue.setText("Last manually detected weight: " + String.valueOf(firstFSR/100.0) + "kg");
                 }
+                AlertDialog.Builder builder = new AlertDialog.Builder(ArduinoMain.this);
+                builder.setMessage("Temperature: ")
+                        .setCancelable(false)
+                        .setPositiveButton("DISMISS", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                //do things
+                            }
+                        });
+                AlertDialog alert = builder.create();
+                alert.show();
             }
         });
     }
@@ -250,6 +264,7 @@ public class ArduinoMain extends Activity {
     final Runnable myRunnable = new Runnable() {
         String forceValueMessage = "All good!";
         int numGoodPressureCycles;
+        int numBadPressureCycles;
         public void run() {
             String stored = "";
             try {
@@ -259,14 +274,14 @@ public class ArduinoMain extends Activity {
                 int i = 0;
 
                 while(i<4){
-                    if(inputStream.available() > 10) { // read if at least 10 digits are present
+                    if(inputStream.available() > 12) { // read if at least 13 digits are present
                         bytes = inputStream.read(buffer); //read bytes from input buffer
                         readMessage = new String(buffer, 0, bytes);
                         stored = stored + " " + readMessage;
                         Log.d("PlyGuy", readMessage);
                         if (!readMessage.isEmpty()) {
                             try {
-                                int sum = 0;
+                                int bottomSum = 0;
                                 firstFSR = Integer.parseInt(readMessage.substring(0,4));
                                 secondFSR = Integer.parseInt(readMessage.substring(5, 9));
                                 thirdFSR = Integer.parseInt(readMessage.substring(10, 14));
@@ -277,24 +292,43 @@ public class ArduinoMain extends Activity {
                                 newForceValueCount++;
                                 if(newForceValueCount == 1000) { newForceValueCount = 0; } // prevent overflow
                                 for(int index = 0; index < forceValuesMovingAverageFirstFSR.length; index++) {
-                                    sum += forceValuesMovingAverageFirstFSR[index];
-                                    sum += forceValuesMovingAverageSecondFSR[index];
+                                    bottomSum += forceValuesMovingAverageFirstFSR[index];
                                 }
-                                Log.d("PlyGuy", "Sum: " + String.valueOf(sum));
+                                Log.d("PlyGuy", "bottomSum: " + String.valueOf(bottomSum));
 
-                                if(sum > 19500) {
+                                if(bottomSum > 7000) {
+                                    numGoodPressureCycles = 0;
+                                    numBadPressureCycles++;
+                                    if(numBadPressureCycles > 30) {
+                                        Log.d("PlyGuy", "A little too much");
+                                        forceValueMessage = "Apply Sock Ply!";
+                                        statusTitle.setBackgroundColor(Color.parseColor("#B70F0A"));
+                                        findViewById(R.id.RL).setBackgroundColor(getResources().getColor(R.color.colorLightRed));
+                                        plyMessage.setText("1 Ply");
+                                        plyMessage.setVisibility(View.VISIBLE);
+                                        checkmark.setVisibility(View.INVISIBLE);
+                                        circle.setVisibility(View.VISIBLE);
+                                    }
+                                }
+                                if(bottomSum > 9000 && numBadPressureCycles > 10) { // if it greatly exceeds threshold and already had some bad values
                                     Log.d("PlyGuy", "Too much");
                                     forceValueMessage = "Apply Sock Ply!";
                                     statusTitle.setBackgroundColor(Color.parseColor("#B70F0A"));
                                     findViewById(R.id.RL).setBackgroundColor(getResources().getColor(R.color.colorLightRed));
-                                    findViewById(R.id.checkmark).setVisibility(View.INVISIBLE);
+                                    plyMessage.setText("2 Ply");
+                                    plyMessage.setVisibility(View.VISIBLE);
+                                    checkmark.setVisibility(View.INVISIBLE);
+                                    circle.setVisibility(View.VISIBLE);
                                     numGoodPressureCycles = 0;
-                                } else if (sum < 18000){ // pressure is gone; need consecutive tries until good
+                                } else if (bottomSum < 5500){ // pressure is gone; need consecutive tries until good
                                     numGoodPressureCycles++;
+                                    numBadPressureCycles = 0;
                                     if(numGoodPressureCycles > 20) {
                                         statusTitle.setBackgroundColor(getResources().getColor(R.color.colorDarkGreen));
                                         findViewById(R.id.RL).setBackgroundColor(getResources().getColor(R.color.colorLightGreen));
-                                        findViewById(R.id.checkmark).setVisibility(View.VISIBLE);
+                                        checkmark.setVisibility(View.VISIBLE);
+                                        circle.setVisibility(View.INVISIBLE);
+                                        plyMessage.setVisibility(View.INVISIBLE);
                                         forceValueMessage = "All Good!";
                                     }
                                 }
