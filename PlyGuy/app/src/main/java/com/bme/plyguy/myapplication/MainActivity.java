@@ -48,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.navigation_dashboard:
                     return true;
                 case R.id.navigation_notifications:
+                    Intent i = new Intent(MainActivity.this, Settings.class);
+                    startActivity(i);
                     return true;
             }
             return false;

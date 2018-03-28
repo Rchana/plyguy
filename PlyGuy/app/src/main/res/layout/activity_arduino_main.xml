@@ -115,6 +115,52 @@
             android:text="2 Ply"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
 
+        <Button
+            android:id="@+id/changedSocks"
+            android:layout_below="@+id/checkmark"
+            android:text="Changed Socks and Prosthesis Donned"
+            android:background="@color/colorLightGreen"
+            android:layout_width="300dp"
+            android:layout_height="35dp"
+            android:layout_marginTop="10dp"
+            android:layout_centerHorizontal="true"
+            android:textAllCaps="false"
+            android:visibility="invisible" />
+
+        <Button
+            android:id="@+id/snooze"
+            android:layout_width="150dp"
+            android:layout_height="42dp"
+            android:layout_below="@+id/changedSocks"
+            android:layout_marginTop="10dp"
+            android:layout_centerHorizontal="true"
+            android:gravity="center_horizontal"
+            android:text="Snooze 20 Min"
+            android:textAllCaps="false"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/upDown"
+            android:layout_width="20dp"
+            android:layout_height="60dp"
+            android:layout_alignEnd="@+id/checkmark"
+            android:layout_below="@+id/changedSocks"
+            android:scaleX="1.5"
+            android:scaleY="1.5"
+            android:src="@drawable/arrow_up_down"
+            android:visibility="invisible" />
+
+        <ProgressBar
+            android:id="@+id/progressSpinner"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:scaleX="5"
+            android:scaleY="5"
+            android:visibility="invisible"/>
+
     </RelativeLayout>
 
     <android.support.design.widget.BottomNavigationView

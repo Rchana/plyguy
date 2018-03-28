@@ -26,6 +26,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.os.Handler;
@@ -34,6 +36,8 @@ public class ArduinoMain extends Activity {
 
     //Declare buttons & editText
     Button functionOne, checkSockStatus;
+    Button changedSocks;
+    Button snooze;
     TextView forceValue;
     TextView weightValue;
     TextView statusTitle;
@@ -41,6 +45,8 @@ public class ArduinoMain extends Activity {
     BottomNavigationView navigation;
     ImageView circle;
     ImageView checkmark;
+    ImageView upDown;
+    ProgressBar progressSpinner;
 
     int firstFSR; // represents first FSR bluetooth serial data after parsing to int
     int secondFSR; // represents second FSR bluetooth serial data after parsing to int
@@ -50,6 +56,14 @@ public class ArduinoMain extends Activity {
     int[] forceValuesMovingAverageThirdFSR = new int[10];
 
     int newForceValueCount;
+
+    int numGoodPressureCycles;
+    int numBadPressureCycles;
+
+    // pause runnable variables
+    boolean stayAtOnePly = false;
+    boolean stayAtTwoPly = false;
+    boolean removeOnePly = false;
 
     // import fields to constantly update GUI
     int time = 0;
@@ -82,10 +96,9 @@ public class ArduinoMain extends Activity {
 //                    mTextMessage.setText(R.string.title_home);
 //                    return true;
                 case R.id.navigation_dashboard:
+                    stayAtOnePly = false;
                     return true;
                 case R.id.navigation_notifications:
-                    Intent i = new Intent(ArduinoMain.this, Settings.class);
-                    startActivity(i);
                     return true;
             }
             return false;
@@ -109,8 +122,11 @@ public class ArduinoMain extends Activity {
         weightValue = findViewById(R.id.weightValue);
         circle = findViewById(R.id.circle);
         checkmark = findViewById(R.id.checkmark);
+        upDown = findViewById(R.id.upDown);
         plyMessage = findViewById(R.id.plyMessage);
-
+        changedSocks = findViewById(R.id.changedSocks);
+        snooze = findViewById(R.id.snooze);
+        progressSpinner = findViewById(R.id.progressSpinner);
         //getting the bluetooth adapter value and calling checkBTstate function
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         checkBTState();
@@ -136,21 +152,102 @@ public class ArduinoMain extends Activity {
 
         checkSockStatus.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                if(firstFSR > 1000) {
-                    weightValue.setText("Last manually detected weight: " + ">> 10 kg");
-                } else {
-                    weightValue.setText("Last manually detected weight: " + String.valueOf(firstFSR/100.0) + "kg");
+            if(firstFSR > 1000) {
+                weightValue.setText("Last manually detected weight: " + ">> 10 kg");
+            } else {
+                weightValue.setText("Last manually detected weight: " + String.valueOf(firstFSR/100.0) + "kg");
+            }
+            AlertDialog.Builder builder = new AlertDialog.Builder(ArduinoMain.this);
+            builder.setMessage("Temperature: ")
+                    .setCancelable(false)
+                    .setPositiveButton("DISMISS", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            //do things
+                        }
+                    });
+            AlertDialog alert = builder.create();
+            alert.show();
+            }
+        });
+
+        changedSocks.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+            statusTitle.setText("Checking Ply Amount");
+            statusTitle.setBackgroundColor(getResources().getColor(R.color.colorDarkBlue));
+            plyMessage.setVisibility(View.INVISIBLE);
+            circle.setVisibility(View.INVISIBLE);
+            changedSocks.setVisibility(View.INVISIBLE);
+            snooze.setVisibility(View.INVISIBLE);
+            upDown.setVisibility(View.INVISIBLE);
+            forceValue.setText("Checking Ply Amount");
+            progressSpinner.setVisibility(View.VISIBLE);
+            progressSpinner.getIndeterminateDrawable().setColorFilter(0xFFcc0000,
+                        android.graphics.PorterDuff.Mode.MULTIPLY);
+            findViewById(R.id.RL).setBackgroundColor(getResources().getColor(R.color.colorLightGrey));
+
+            final Timer timer = new Timer();
+            timer.schedule( new TimerTask() {
+                int numCounts;
+                int[] firstFSRMovingAverageInTimer = new int[30];
+                int[] sidesFSRMovingAverageInTimer = new int[30];
+                int firstSum;
+                int sidesSum;
+                public void run() {
+                    // do your work
+                    firstSum = 0;
+                    sidesSum = 0;
+                    Log.d("PlyGuy", "FSRs I'm reading: " + firstFSR + " " + secondFSR + " " + thirdFSR + " ");
+                    numCounts++;
+                    firstFSRMovingAverageInTimer[numCounts%30] = firstFSR;
+                    sidesFSRMovingAverageInTimer[numCounts%30] = secondFSR + thirdFSR;
+                    if(numCounts > 50 ) {
+                        for(int i = 0; i < firstFSRMovingAverageInTimer.length; i++) {
+                            firstSum += firstFSRMovingAverageInTimer[i];
+                            sidesSum += sidesFSRMovingAverageInTimer[i];
+                        }
+
+                        if(firstSum > 22000) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    progressSpinner.setVisibility(View.INVISIBLE);
+                                    circle.setVisibility(View.VISIBLE);
+                                    plyMessage.setVisibility(View.VISIBLE);
+                                    statusTitle.setText("Apply Sock Ply!");
+                                    forceValue.setText("Apply Sock Ply");
+                                    plyMessage.setText("1 Ply");
+                                    statusTitle.setBackgroundColor(Color.parseColor("#B70F0A"));
+                                    findViewById(R.id.RL).setBackgroundColor(getResources().getColor(R.color.colorLightRed));
+                                    changedSocks.setVisibility(View.VISIBLE);
+                                    upDown.setVisibility(View.VISIBLE);
+                                    snooze.setVisibility(View.VISIBLE);
+                                    stayAtOnePly = true;
+                                    stayAtTwoPly = true;
+                                    timer.cancel();
+                                }
+                            });
+                        } else {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    progressSpinner.setVisibility(View.INVISIBLE);
+                                    checkmark.setVisibility(View.VISIBLE);
+                                    statusTitle.setText("All Good!");
+                                    forceValue.setText("All Good");
+                                    statusTitle.setBackgroundColor(getResources().getColor(R.color.colorDarkGreen));
+                                    findViewById(R.id.RL).setBackgroundColor(getResources().getColor(R.color.colorLightGreen));
+                                    stayAtOnePly = false;
+                                    stayAtTwoPly = false;
+                                    removeOnePly = false;
+                                    numGoodPressureCycles = 50;
+                                    numBadPressureCycles = 0;
+                                }
+                            });
+                        }
+                        timer.cancel();
+                    }
                 }
-                AlertDialog.Builder builder = new AlertDialog.Builder(ArduinoMain.this);
-                builder.setMessage("Temperature: ")
-                        .setCancelable(false)
-                        .setPositiveButton("DISMISS", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                //do things
-                            }
-                        });
-                AlertDialog alert = builder.create();
-                alert.show();
+            }, 0, 110);
             }
         });
     }
@@ -262,9 +359,7 @@ public class ArduinoMain extends Activity {
     }
 
     final Runnable myRunnable = new Runnable() {
-        String forceValueMessage = "All good!";
-        int numGoodPressureCycles;
-        int numBadPressureCycles;
+        String forceValueMessage = "All Good!";
         public void run() {
             String stored = "";
             try {
@@ -280,21 +375,36 @@ public class ArduinoMain extends Activity {
                         stored = stored + " " + readMessage;
                         Log.d("PlyGuy", readMessage);
                         if (!readMessage.isEmpty()) {
+                            if(stayAtOnePly || stayAtTwoPly || removeOnePly) {
+                                try {
+                                    firstFSR = Integer.parseInt(readMessage.substring(0,4));
+                                    secondFSR = Integer.parseInt(readMessage.substring(5, 9));
+                                    thirdFSR = Integer.parseInt(readMessage.substring(10, 14));
+                                }catch(Exception e){
+                                    Log.d("PlyGuy", "Failed the checking");
+                                }
+                                continue;
+                            }
+
                             try {
                                 int bottomSum = 0;
+                                int sideSum = 0;
                                 firstFSR = Integer.parseInt(readMessage.substring(0,4));
                                 secondFSR = Integer.parseInt(readMessage.substring(5, 9));
                                 thirdFSR = Integer.parseInt(readMessage.substring(10, 14));
 
+                                Log.d("PlyGuy", Boolean.toString(stayAtOnePly));
                                 forceValuesMovingAverageFirstFSR[newForceValueCount%10] = firstFSR;
                                 forceValuesMovingAverageSecondFSR[newForceValueCount%10] = secondFSR;
                                 forceValuesMovingAverageThirdFSR[newForceValueCount%10] = thirdFSR;
                                 newForceValueCount++;
+
                                 if(newForceValueCount == 1000) { newForceValueCount = 0; } // prevent overflow
                                 for(int index = 0; index < forceValuesMovingAverageFirstFSR.length; index++) {
                                     bottomSum += forceValuesMovingAverageFirstFSR[index];
+                                    sideSum += forceValuesMovingAverageSecondFSR[index] + forceValuesMovingAverageThirdFSR[index];
                                 }
-                                Log.d("PlyGuy", "bottomSum: " + String.valueOf(bottomSum));
+                                Log.d("PlyGuy", "bottomSum: " + String.valueOf(bottomSum) + " " + String.valueOf(sideSum));
 
                                 if(bottomSum > 7000) {
                                     numGoodPressureCycles = 0;
@@ -307,7 +417,12 @@ public class ArduinoMain extends Activity {
                                         plyMessage.setText("1 Ply");
                                         plyMessage.setVisibility(View.VISIBLE);
                                         checkmark.setVisibility(View.INVISIBLE);
+                                        checkSockStatus.setVisibility(View.INVISIBLE);
                                         circle.setVisibility(View.VISIBLE);
+                                        changedSocks.setVisibility(View.VISIBLE);
+                                        upDown.setVisibility(View.VISIBLE);
+                                        snooze.setVisibility(View.VISIBLE);
+                                        stayAtOnePly = true;
                                     }
                                 }
                                 if(bottomSum > 9000 && numBadPressureCycles > 10) { // if it greatly exceeds threshold and already had some bad values
@@ -318,19 +433,51 @@ public class ArduinoMain extends Activity {
                                     plyMessage.setText("2 Ply");
                                     plyMessage.setVisibility(View.VISIBLE);
                                     checkmark.setVisibility(View.INVISIBLE);
+                                    checkSockStatus.setVisibility(View.INVISIBLE);
                                     circle.setVisibility(View.VISIBLE);
+                                    changedSocks.setVisibility(View.VISIBLE);
+                                    upDown.setVisibility(View.VISIBLE);
+                                    snooze.setVisibility(View.VISIBLE);
                                     numGoodPressureCycles = 0;
-                                } else if (bottomSum < 5500){ // pressure is gone; need consecutive tries until good
+                                    stayAtTwoPly = true;
+                                } else if(sideSum > 15000) {
+                                    Log.d("PlyGuy", "Too little");
+                                    numGoodPressureCycles = 0;
+                                    forceValueMessage = "Remove Sock Ply!";
+                                    statusTitle.setBackgroundColor(Color.parseColor("#B70F0A"));
+                                    findViewById(R.id.RL).setBackgroundColor(getResources().getColor(R.color.colorLightRed));
+                                    plyMessage.setText("1 Ply");
+                                    plyMessage.setVisibility(View.VISIBLE);
+                                    checkmark.setVisibility(View.INVISIBLE);
+                                    checkSockStatus.setVisibility(View.INVISIBLE);
+                                    circle.setVisibility(View.VISIBLE);
+                                    changedSocks.setVisibility(View.VISIBLE);
+                                    upDown.setVisibility(View.VISIBLE);
+                                    snooze.setVisibility(View.VISIBLE);
+                                    numGoodPressureCycles = 0;
+                                    removeOnePly = true;
+                                }
+                                else if (bottomSum < 6000){ // pressure is gone; need consecutive tries until good
                                     numGoodPressureCycles++;
                                     numBadPressureCycles = 0;
                                     if(numGoodPressureCycles > 20) {
                                         statusTitle.setBackgroundColor(getResources().getColor(R.color.colorDarkGreen));
                                         findViewById(R.id.RL).setBackgroundColor(getResources().getColor(R.color.colorLightGreen));
                                         checkmark.setVisibility(View.VISIBLE);
+                                        checkSockStatus.setVisibility(View.VISIBLE);
                                         circle.setVisibility(View.INVISIBLE);
                                         plyMessage.setVisibility(View.INVISIBLE);
+                                        changedSocks.setVisibility(View.INVISIBLE);
+                                        snooze.setVisibility(View.INVISIBLE);
+                                        upDown.setVisibility(View.INVISIBLE);
                                         forceValueMessage = "All Good!";
                                     }
+                                }
+                                forceValue.setText(forceValueMessage);
+                                statusTitle.setText(forceValueMessage);
+                                if(numGoodPressureCycles > 30) {
+                                    forceValue.setText("All Good!");
+                                    statusTitle.setText("All Good!");
                                 }
                             } catch(Exception e) {
                                 Log.d("PlyGuy", "Invalid format");
@@ -339,8 +486,6 @@ public class ArduinoMain extends Activity {
                     }
                     i++;
                 }
-                forceValue.setText(forceValueMessage);
-                statusTitle.setText(forceValueMessage);
             } catch (IOException e) {
                 // Toast.makeText(getBaseContext(), "ERROR - disconnected", Toast.LENGTH_SHORT).show();
             }

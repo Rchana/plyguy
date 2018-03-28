@@ -6,4 +6,6 @@
     <color name="colorDarkGreen">#4C7A34</color>
     <color name="colorLightGreen">#CBE8BA</color>
     <color name="colorLightRed">#FFF1D7</color>
+    <color name="colorDarkBlue">#033076</color>
+    <color name="colorLightGrey">#C0C0C0</color>
 </resources>
