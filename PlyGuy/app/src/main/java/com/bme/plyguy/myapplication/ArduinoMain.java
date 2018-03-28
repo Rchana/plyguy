@@ -220,8 +220,9 @@ public class ArduinoMain extends Activity {
                         for(int i = 0; i < firstFSRMovingAverageInTimer.length; i++) {
                             firstSum += firstFSRMovingAverageInTimer[i];
                             sidesSumTimer += sidesFSRMovingAverageInTimer[i];
+                            Log.d("PlyGuy", Integer.toString(sidesSumTimer/3));
                         }
-                        sideSum = sidesSumTimer;
+                        sideSum = 0;
                         if(firstSum > 22000) {
                             runOnUiThread(new Runnable() {
                                 @Override
@@ -490,7 +491,7 @@ public class ArduinoMain extends Activity {
                                     snooze.setVisibility(View.VISIBLE);
                                     numGoodPressureCycles = 0;
                                     stayAtTwoPly = true;
-                                } else if(sideSum > 15000) {
+                                } else if(sideSum > 16000) {
                                     Log.d("PlyGuy", "Too little");
                                     NotificationCompat.Builder mBuilder =
                                             new NotificationCompat.Builder(ArduinoMain.this)
