@@ -67,6 +67,7 @@ public class ArduinoMain extends Activity {
 
     int numGoodPressureCycles;
     int numBadPressureCycles;
+    int sideSum;
 
     // pause runnable variables
     boolean stayAtOnePly = false;
@@ -206,6 +207,7 @@ public class ArduinoMain extends Activity {
                 int[] sidesFSRMovingAverageInTimer = new int[30];
                 int firstSum;
                 int sidesSumTimer;
+
                 public void run() {
                     // do your work
                     firstSum = 0;
@@ -219,7 +221,7 @@ public class ArduinoMain extends Activity {
                             firstSum += firstFSRMovingAverageInTimer[i];
                             sidesSumTimer += sidesFSRMovingAverageInTimer[i];
                         }
-
+                        sideSum = sidesSumTimer;
                         if(firstSum > 22000) {
                             runOnUiThread(new Runnable() {
                                 @Override
@@ -403,7 +405,7 @@ public class ArduinoMain extends Activity {
 
                             try {
                                 int bottomSum = 0;
-                                int sideSum = 0;
+                                sideSum = 0;
                                 firstFSR = Integer.parseInt(readMessage.substring(0,4));
                                 secondFSR = Integer.parseInt(readMessage.substring(5, 9));
                                 thirdFSR = Integer.parseInt(readMessage.substring(10, 14));
