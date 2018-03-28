@@ -1,7 +1,7 @@
 package com.bme.plyguy.myapplication;
 
 import java.io.IOException;
-
+import java.util.Random;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
@@ -14,6 +14,7 @@ import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AlertDialog;
+import android.text.Html;
 import android.util.Log;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -157,8 +158,14 @@ public class ArduinoMain extends Activity {
             } else {
                 weightValue.setText("Last manually detected weight: " + String.valueOf(firstFSR/100.0) + "kg");
             }
+
+            Random rand = new Random();
+
+            // nextInt is normally exclusive of the top value,
+            // so add 1 to make it inclusive
+            int randomNum = rand.nextInt((24 - 21) + 1) + 21;
             AlertDialog.Builder builder = new AlertDialog.Builder(ArduinoMain.this);
-            builder.setMessage("Temperature: ")
+            builder.setMessage(Html.fromHtml("<b>Temperature:</b> " + randomNum + (char) 0x00B0 + "C" + "<br><b>Last Used:</b> March 28, 2018" + "<br><b>Last Doctor Visit:</b> March 24, 2018"))
                     .setCancelable(false)
                     .setPositiveButton("DISMISS", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
@@ -191,11 +198,11 @@ public class ArduinoMain extends Activity {
                 int[] firstFSRMovingAverageInTimer = new int[30];
                 int[] sidesFSRMovingAverageInTimer = new int[30];
                 int firstSum;
-                int sidesSum;
+                int sidesSumTimer;
                 public void run() {
                     // do your work
                     firstSum = 0;
-                    sidesSum = 0;
+                    sidesSumTimer = 0;
                     Log.d("PlyGuy", "FSRs I'm reading: " + firstFSR + " " + secondFSR + " " + thirdFSR + " ");
                     numCounts++;
                     firstFSRMovingAverageInTimer[numCounts%30] = firstFSR;
@@ -203,7 +210,7 @@ public class ArduinoMain extends Activity {
                     if(numCounts > 50 ) {
                         for(int i = 0; i < firstFSRMovingAverageInTimer.length; i++) {
                             firstSum += firstFSRMovingAverageInTimer[i];
-                            sidesSum += sidesFSRMovingAverageInTimer[i];
+                            sidesSumTimer += sidesFSRMovingAverageInTimer[i];
                         }
 
                         if(firstSum > 22000) {
@@ -231,6 +238,7 @@ public class ArduinoMain extends Activity {
                                 @Override
                                 public void run() {
                                     progressSpinner.setVisibility(View.INVISIBLE);
+                                    checkSockStatus.setVisibility(View.VISIBLE);
                                     checkmark.setVisibility(View.VISIBLE);
                                     statusTitle.setText("All Good!");
                                     forceValue.setText("All Good");
