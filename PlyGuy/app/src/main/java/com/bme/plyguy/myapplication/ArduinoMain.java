@@ -9,10 +9,17 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.lang.Runnable;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.os.Build;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.Html;
 import android.util.Log;
@@ -222,7 +229,7 @@ public class ArduinoMain extends Activity {
                                     plyMessage.setVisibility(View.VISIBLE);
                                     statusTitle.setText("Apply Sock Ply!");
                                     forceValue.setText("Apply Sock Ply");
-                                    plyMessage.setText("1 Ply");
+                                    plyMessage.setText("Add \n1 Ply");
                                     statusTitle.setBackgroundColor(Color.parseColor("#B70F0A"));
                                     findViewById(R.id.RL).setBackgroundColor(getResources().getColor(R.color.colorLightRed));
                                     changedSocks.setVisibility(View.VISIBLE);
@@ -418,11 +425,28 @@ public class ArduinoMain extends Activity {
                                     numGoodPressureCycles = 0;
                                     numBadPressureCycles++;
                                     if(numBadPressureCycles > 30) {
+                                        NotificationCompat.Builder mBuilder =
+                                                new NotificationCompat.Builder(ArduinoMain.this)
+                                                        .setSmallIcon(R.drawable.ic_notifications_black_24dp)
+                                                        .setContentTitle("PlyGuy")
+                                                        .setContentText("Apply Sock Ply!");
+                                        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                                        mNotificationManager.notify(001, mBuilder.build());
+
+                                        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                                        // Vibrate for 500 milliseconds
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                            v.vibrate(VibrationEffect.createOneShot(250, VibrationEffect.DEFAULT_AMPLITUDE));
+                                        }else{
+                                            //deprecated in API 26
+                                            v.vibrate(500);
+                                        }
+
                                         Log.d("PlyGuy", "A little too much");
                                         forceValueMessage = "Apply Sock Ply!";
                                         statusTitle.setBackgroundColor(Color.parseColor("#B70F0A"));
                                         findViewById(R.id.RL).setBackgroundColor(getResources().getColor(R.color.colorLightRed));
-                                        plyMessage.setText("1 Ply");
+                                        plyMessage.setText("Add \n1 Ply");
                                         plyMessage.setVisibility(View.VISIBLE);
                                         checkmark.setVisibility(View.INVISIBLE);
                                         checkSockStatus.setVisibility(View.INVISIBLE);
@@ -435,10 +459,26 @@ public class ArduinoMain extends Activity {
                                 }
                                 if(bottomSum > 9000 && numBadPressureCycles > 10) { // if it greatly exceeds threshold and already had some bad values
                                     Log.d("PlyGuy", "Too much");
+                                    NotificationCompat.Builder mBuilder =
+                                            new NotificationCompat.Builder(ArduinoMain.this)
+                                                    .setSmallIcon(R.drawable.ic_notifications_black_24dp)
+                                                    .setContentTitle("PlyGuy")
+                                                    .setContentText("Apply Sock Ply!");
+                                    NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                                    mNotificationManager.notify(001, mBuilder.build());
+
+                                    Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                                    // Vibrate for 500 milliseconds
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                        v.vibrate(VibrationEffect.createOneShot(250, VibrationEffect.DEFAULT_AMPLITUDE));
+                                    }else{
+                                        //deprecated in API 26
+                                        v.vibrate(500);
+                                    }
                                     forceValueMessage = "Apply Sock Ply!";
                                     statusTitle.setBackgroundColor(Color.parseColor("#B70F0A"));
                                     findViewById(R.id.RL).setBackgroundColor(getResources().getColor(R.color.colorLightRed));
-                                    plyMessage.setText("2 Ply");
+                                    plyMessage.setText("Add \n2 Ply");
                                     plyMessage.setVisibility(View.VISIBLE);
                                     checkmark.setVisibility(View.INVISIBLE);
                                     checkSockStatus.setVisibility(View.INVISIBLE);
@@ -450,11 +490,27 @@ public class ArduinoMain extends Activity {
                                     stayAtTwoPly = true;
                                 } else if(sideSum > 15000) {
                                     Log.d("PlyGuy", "Too little");
+                                    NotificationCompat.Builder mBuilder =
+                                            new NotificationCompat.Builder(ArduinoMain.this)
+                                                    .setSmallIcon(R.drawable.ic_notifications_black_24dp)
+                                                    .setContentTitle("PlyGuy")
+                                                    .setContentText("Remove Sock Ply!");
+                                    NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                                    mNotificationManager.notify(001, mBuilder.build());
+
+                                    Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                                    // Vibrate for 500 milliseconds
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                        v.vibrate(VibrationEffect.createOneShot(250, VibrationEffect.DEFAULT_AMPLITUDE));
+                                    }else{
+                                        //deprecated in API 26
+                                        v.vibrate(500);
+                                    }
                                     numGoodPressureCycles = 0;
                                     forceValueMessage = "Remove Sock Ply!";
                                     statusTitle.setBackgroundColor(Color.parseColor("#B70F0A"));
                                     findViewById(R.id.RL).setBackgroundColor(getResources().getColor(R.color.colorLightRed));
-                                    plyMessage.setText("1 Ply");
+                                    plyMessage.setText("Remove \n1 Ply");
                                     plyMessage.setVisibility(View.VISIBLE);
                                     checkmark.setVisibility(View.INVISIBLE);
                                     checkSockStatus.setVisibility(View.INVISIBLE);
