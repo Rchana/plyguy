@@ -67,6 +67,7 @@ public class ArduinoMain extends Activity {
 
     int numGoodPressureCycles;
     int numBadPressureCycles;
+    int numBadSidePressureCycles;
     int sideSum;
 
     // pause runnable variables
@@ -240,6 +241,7 @@ public class ArduinoMain extends Activity {
                                     snooze.setVisibility(View.VISIBLE);
                                     stayAtOnePly = true;
                                     stayAtTwoPly = true;
+                                    removeOnePly = false;
                                     timer.cancel();
                                 }
                             });
@@ -259,6 +261,10 @@ public class ArduinoMain extends Activity {
                                     removeOnePly = false;
                                     numGoodPressureCycles = 50;
                                     numBadPressureCycles = 0;
+                                    if(sidesSumTimer/3 < 13000) {
+                                        numBadSidePressureCycles = 0;
+                                        sideSum = 0;
+                                    }
                                 }
                             });
                         }
@@ -491,42 +497,46 @@ public class ArduinoMain extends Activity {
                                     snooze.setVisibility(View.VISIBLE);
                                     numGoodPressureCycles = 0;
                                     stayAtTwoPly = true;
-                                } else if(sideSum > 16000) {
+                                } else if(sideSum > 15250) {
+                                    numBadSidePressureCycles++;
                                     Log.d("PlyGuy", "Too little");
-                                    NotificationCompat.Builder mBuilder =
-                                            new NotificationCompat.Builder(ArduinoMain.this)
-                                                    .setSmallIcon(R.drawable.ic_notifications_black_24dp)
-                                                    .setContentTitle("PlyGuy")
-                                                    .setContentText("Remove Sock Ply!");
-                                    NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                                    mNotificationManager.notify(001, mBuilder.build());
+                                    if(numBadSidePressureCycles > 10) {
+                                        NotificationCompat.Builder mBuilder =
+                                                new NotificationCompat.Builder(ArduinoMain.this)
+                                                        .setSmallIcon(R.drawable.ic_notifications_black_24dp)
+                                                        .setContentTitle("PlyGuy")
+                                                        .setContentText("Remove Sock Ply!");
+                                        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                                        mNotificationManager.notify(001, mBuilder.build());
 
-                                    Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                                    // Vibrate for 500 milliseconds
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                        v.vibrate(VibrationEffect.createOneShot(250, VibrationEffect.DEFAULT_AMPLITUDE));
-                                    }else{
-                                        //deprecated in API 26
-                                        v.vibrate(500);
+                                        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                                        // Vibrate for 500 milliseconds
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                            v.vibrate(VibrationEffect.createOneShot(250, VibrationEffect.DEFAULT_AMPLITUDE));
+                                        }else{
+                                            //deprecated in API 26
+                                            v.vibrate(500);
+                                        }
+                                        numGoodPressureCycles = 0;
+                                        forceValueMessage = "Remove Sock Ply!";
+                                        statusTitle.setBackgroundColor(Color.parseColor("#B70F0A"));
+                                        findViewById(R.id.RL).setBackgroundColor(getResources().getColor(R.color.colorLightRed));
+                                        plyMessage.setText("Remove \n1 Ply");
+                                        plyMessage.setVisibility(View.VISIBLE);
+                                        checkmark.setVisibility(View.INVISIBLE);
+                                        checkSockStatus.setVisibility(View.INVISIBLE);
+                                        circle.setVisibility(View.VISIBLE);
+                                        changedSocks.setVisibility(View.VISIBLE);
+                                        upDown.setVisibility(View.VISIBLE);
+                                        snooze.setVisibility(View.VISIBLE);
+                                        numGoodPressureCycles = 0;
+                                        removeOnePly = true;
                                     }
-                                    numGoodPressureCycles = 0;
-                                    forceValueMessage = "Remove Sock Ply!";
-                                    statusTitle.setBackgroundColor(Color.parseColor("#B70F0A"));
-                                    findViewById(R.id.RL).setBackgroundColor(getResources().getColor(R.color.colorLightRed));
-                                    plyMessage.setText("Remove \n1 Ply");
-                                    plyMessage.setVisibility(View.VISIBLE);
-                                    checkmark.setVisibility(View.INVISIBLE);
-                                    checkSockStatus.setVisibility(View.INVISIBLE);
-                                    circle.setVisibility(View.VISIBLE);
-                                    changedSocks.setVisibility(View.VISIBLE);
-                                    upDown.setVisibility(View.VISIBLE);
-                                    snooze.setVisibility(View.VISIBLE);
-                                    numGoodPressureCycles = 0;
-                                    removeOnePly = true;
                                 }
                                 else if (bottomSum < 6000){ // pressure is gone; need consecutive tries until good
                                     numGoodPressureCycles++;
                                     numBadPressureCycles = 0;
+                                    numBadSidePressureCycles = 0;
                                     if(numGoodPressureCycles > 20) {
                                         statusTitle.setBackgroundColor(getResources().getColor(R.color.colorDarkGreen));
                                         findViewById(R.id.RL).setBackgroundColor(getResources().getColor(R.color.colorLightGreen));
